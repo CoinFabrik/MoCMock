@@ -20,6 +20,16 @@ describe('MoCMock', function () {
       expect(await mocMock.mylen()).to.equal(0);
       const _len = await mocMock.getlen();
       expect(_len).to.equal(0);
+      const qACLockedInPending = await mocMock.qACLockedInPending();
+      expect(qACLockedInPending).to.eq(0);
+      const emaBool = await mocMock.emaBool();
+      expect(emaBool).to.be.false;
+      const bts = await mocMock.getBts();
+      expect(bts).to.eq(0);
+      const nextTCInterestPayment = await mocMock.nextTCInterestPayment();
+      expect(nextTCInterestPayment).to.eq(
+        await hre.ethers.provider.getBlockNumber()
+      );
     });
 
     it('Push/pop/reset works..', async function () {
@@ -35,6 +45,27 @@ describe('MoCMock', function () {
       expect(await mocMock.getlen()).to.equal(2);
       await mocMock.reset();
       expect(await mocMock.getlen()).to.equal(0);
+    });
+
+    it('setQA.../setEmaBool/ works', async () => {
+      const { mocMock } = await loadFixture(deployOneYearMoCMockFixture);
+      await mocMock.setQACLockedInPending(42);
+      expect(await mocMock.qACLockedInPending()).to.eq(42);
+      await mocMock.setEmaBool(true);
+      expect(await mocMock.emaBool()).to.be.true;
+      await mocMock.setBts(42);
+      expect(await mocMock.getBts()).to.eq(42);
+      await mocMock.setNextTCInterestPayment(42);
+      expect(await mocMock.nextTCInterestPayment()).to.eq(42);
+
+      // Reset contract
+      await mocMock.reset();
+      expect(await mocMock.emaBool()).to.be.false;
+      expect(await mocMock.qACLockedInPending()).to.eq(0);
+      expect(await mocMock.getBts()).to.eq(0);
+      expect(await mocMock.nextTCInterestPayment()).to.eq(
+        await hre.ethers.provider.getBlockNumber()
+      );
     });
   });
 });
