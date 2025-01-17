@@ -1,13 +1,16 @@
-# Sample Hardhat Project
-
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a Hardhat Ignition module that deploys that contract.
+# MocMock
 
 Try running some of the following tasks:
 
 ```shell
 npx hardhat help
+npx hardhat compile
 npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
+
 npx hardhat ignition deploy ./ignition/modules/MoCMock.ts
+npx hardhat ignition deploy ./ignition/modules/Multicall3.ts
+npx hardhat --network ganache ignition deploy ./ignition/modules/MoCMock.ts
+npx hardhat --network ganache  ignition deploy ./ignition/modules/Multicall3.ts
 ```
+
+`--network ganache` for rpc node on localhost.
