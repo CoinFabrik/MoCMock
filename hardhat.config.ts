@@ -40,7 +40,10 @@ const config: HardhatUserConfig = {
   networks: {
     docker: {
       url: 'http://192.168.1.54:8545/'
-    }
+    },
+    ganache: {
+      url: 'http://localhost:8545/'
+    },
   }
 };
 
