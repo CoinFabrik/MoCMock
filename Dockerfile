@@ -12,4 +12,4 @@ COPY . /home/
 RUN npm install
 RUN npx hardhat compile
 ENV HARDHAT_IGNITION_CONFIRM_DEPLOYMENT=false
-ENTRYPOINT ["npx", "hardhat", "ignition", "deploy", "./ignition/modules/Lock.ts", "--network", "docker"]
+ENTRYPOINT ["npx", "hardhat", "ignition", "deploy", "./ignition/modules/MoCMock.ts", "--network", "docker"]
