@@ -1,10 +1,8 @@
-import {
-  time,
-  loadFixture,
-} from '@nomicfoundation/hardhat-toolbox/network-helpers';
-import { anyValue } from '@nomicfoundation/hardhat-chai-matchers/withArgs';
+import { loadFixture } from '@nomicfoundation/hardhat-toolbox/network-helpers';
 import { expect } from 'chai';
-import hre from 'hardhat';
+import hre, { ethers } from 'hardhat';
+import { condPubStatus } from './utils';
+import { MoCMock } from '../typechain-types';
 
 describe('MoCMock', function () {
   async function deployOneYearMoCMockFixture() {
@@ -64,8 +62,142 @@ describe('MoCMock', function () {
       expect(await mocMock.qACLockedInPending()).to.eq(0);
       expect(await mocMock.getBts()).to.eq(1);
       expect(await mocMock.nextTCInterestPayment()).to.eq(
-        await hre.ethers.provider.getBlockNumber() + 1000
+        (await hre.ethers.provider.getBlockNumber()) + 1000
       );
+    });
+  });
+
+  describe('Conditional publishing conditions', function () {
+    let mocMock: MoCMock;
+    this.beforeAll(async () => {
+      ({ mocMock } = await loadFixture(deployOneYearMoCMockFixture));
+    });
+
+    it('Cond pub should evaluate to false on deploy', async () => {
+      const currentBlock = await ethers.provider.getBlockNumber();
+
+      const [
+        qACLockedInPending,
+        shouldCalculateEma,
+        bts,
+        nextTCInterestPayment,
+      ] = await Promise.all([
+        mocMock.qACLockedInPending(),
+        mocMock.shouldCalculateEma(),
+        mocMock.getBts(),
+        mocMock.nextTCInterestPayment(),
+      ]);
+
+      expect(
+        condPubStatus({
+          qACLockedInPending,
+          ema: shouldCalculateEma,
+          bts,
+          nextTCArgs: {
+            nextTCInterestPayment,
+            currentBlock,
+          },
+        })
+      ).to.be.false;
+    });
+
+    it('Cond pub should evaluate to true if qACLockedInPending > 0', async () => {
+      await mocMock.setQACLockedInPending(1);
+
+      const qACLockedInPending = await mocMock.qACLockedInPending();
+
+      expect(condPubStatus({ qACLockedInPending })).to.be.true;
+    });
+
+    it('Cond pub should evaluate to true if shouldCalculateEma returns true', async () => {
+      await mocMock.setEmaBool(true);
+
+      const ema = await mocMock.shouldCalculateEma();
+
+      expect(condPubStatus({ ema })).to.be.true;
+    });
+
+    it('Cond pub should evaluate to true if getBts returns 0', async () => {
+      await mocMock.setBts(0);
+
+      const bts = await mocMock.getBts();
+
+      expect(condPubStatus({ bts })).to.be.true;
+    });
+
+    it('Cond pub should evaluate to true if currentBlock > nextTCInterestPayment', async () => {
+      const currentBlock = await ethers.provider.getBlockNumber();
+      await mocMock.setNextTCInterestPayment(currentBlock - 1);
+
+      const nextTCInterestPayment = await mocMock.nextTCInterestPayment();
+
+      expect(
+        condPubStatus({ nextTCArgs: { nextTCInterestPayment, currentBlock } })
+      ).to.be.true;
+    });
+
+    it('After a reset, con pub should evaluate to false', async () => {
+      const currentBlock = await ethers.provider.getBlockNumber();
+
+      await Promise.all([
+        mocMock.setQACLockedInPending(1),
+        mocMock.setEmaBool(true),
+        mocMock.setBts(0),
+        mocMock.setNextTCInterestPayment(currentBlock - 1),
+      ]);
+
+      const [
+        qACLockedInPending,
+        shouldCalculateEma,
+        bts,
+        nextTCInterestPayment,
+      ] = await Promise.all([
+        mocMock.qACLockedInPending(),
+        mocMock.shouldCalculateEma(),
+        mocMock.getBts(),
+        mocMock.nextTCInterestPayment(),
+      ]);
+
+      expect(
+        condPubStatus({
+          qACLockedInPending,
+          ema: shouldCalculateEma,
+          bts,
+          nextTCArgs: {
+            nextTCInterestPayment,
+            currentBlock,
+          },
+        })
+      ).to.be.true;
+
+      await mocMock.reset();
+
+      // AR = After Reset
+      const currentBlockAR = await ethers.provider.getBlockNumber();
+
+      const [
+        qACLockedInPendingAR,
+        shouldCalculateEmaAR,
+        btsAR,
+        nextTCInterestPaymentAR,
+      ] = await Promise.all([
+        mocMock.qACLockedInPending(),
+        mocMock.shouldCalculateEma(),
+        mocMock.getBts(),
+        mocMock.nextTCInterestPayment(),
+      ]);
+
+      expect(
+        condPubStatus({
+          qACLockedInPending: qACLockedInPendingAR,
+          ema: shouldCalculateEmaAR,
+          bts: btsAR,
+          nextTCArgs: {
+            nextTCInterestPayment: nextTCInterestPaymentAR,
+            currentBlock: currentBlockAR,
+          },
+        })
+      ).to.be.false;
     });
   });
 });
