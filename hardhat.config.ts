@@ -168,14 +168,14 @@ task('readQAClock', 'Query qACLockedInPending var')
     }
   });
 
-task('readEmaBool', 'Query emaBool var')
+task('shouldCalculateEma', 'Query emaBool var')
   .addPositionalParam('address', 'The contract address')
   .setAction(async (taskArgs, hre, runSuper) => {
     const MyContract = await ethers.getContractFactory('MoCMock');
     const contract = MyContract.attach(taskArgs.address);
     try {
-      const emaBool = await contract.emaBool();
-      console.log('emaBool:', emaBool);
+      const emaBool = await contract.shouldCalculateEma();
+      console.log('shouldCalculateEma:', emaBool);
     } catch (e) {
       throw new Error(`Unexpected error: ${e}`);
     }
@@ -217,31 +217,34 @@ task('readAll', 'Query all state vars')
     const contract = MyContract.attach(taskArgs.address);
     try {
       const [
-        owner,
         mylen,
         qACLockedInPending,
-        emaBool,
+        shouldCalculateEma,
         bts,
         nextTCInterestPayment,
       ] = await Promise.all([
-        contract.owner(),
         contract.mylen(),
         contract.qACLockedInPending(),
-        contract.emaBool(),
+        contract.shouldCalculateEma(),
         contract.getBts(),
         contract.nextTCInterestPayment(),
       ]);
 
       let state = {
-        owner,
         mylen,
         qACLockedInPending,
-        emaBool,
+        shouldCalculateEma,
         bts,
         nextTCInterestPayment,
       };
 
-      console.log(state);
+      console.log('--------------------------');
+      console.log(
+        'Current blockNumber: ',
+        await ethers.provider.getBlockNumber()
+      );
+      console.log('--------------------------');
+      console.log('Mock Contract state: ', state);
     } catch (e) {
       throw new Error(`Unexpected error: ${e}`);
     }
