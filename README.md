@@ -1,13 +1,14 @@
-# Sample Hardhat Project
+# mocMock
+A simple mock contract, tests and tasks to check conditional publishing conditions.
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a Hardhat Ignition module that deploys that contract.
+## To run tests
+`npx hardhat test`
 
-Try running some of the following tasks:
+## To start a local node
+`npx hardhat node`
 
-```shell
-npx hardhat help
-npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat ignition deploy ./ignition/modules/MoCMock.ts
-```
+## To deploy contracts on local node
+`npx hardhat ignition deploy ./ignition/modules/MoCMock.ts --network ganache`
+
+## To execute a task
+`npx hardhat <TASK_NAME> <CONTRACT_ADDRESS> <...ARGS> --network <NETWORK>`
