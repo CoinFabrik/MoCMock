@@ -153,14 +153,32 @@ task('readAll', 'Query all state vars')
   .setAction(async (taskArgs, hre, runSuper) => {
     const MyContract = await ethers.getContractFactory('MoCMock');
     const contract = MyContract.attach(taskArgs.address);
-    let state: { [key: string]: any } = {};
     try {
-      state['owner'] = await contract.owner();
-      state['mylen'] = await contract.mylen();
-      state['qACLockedInPending'] = await contract.qACLockedInPending();
-      state['emaBool'] = await contract.emaBool();
-      state['bts'] = await contract.getBts();
-      state['nextTCInterestPayment'] = await contract.nextTCInterestPayment();
+      const [
+        owner,
+        mylen,
+        qACLockedInPending,
+        emaBool,
+        bts,
+        nextTCInterestPayment,
+      ] = await Promise.all([
+        contract.owner(),
+        contract.mylen(),
+        contract.qACLockedInPending(),
+        contract.emaBool(),
+        contract.getBts(),
+        contract.nextTCInterestPayment(),
+      ]);
+
+      let state = {
+        owner,
+        mylen,
+        qACLockedInPending,
+        emaBool,
+        bts,
+        nextTCInterestPayment,
+      };
+
       console.log(state);
     } catch (e) {
       throw new Error(`Unexpected error: ${e}`);
