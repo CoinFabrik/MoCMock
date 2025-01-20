@@ -92,7 +92,7 @@ task('setEma-t', 'Set emaBool var to `true` (Condition: emaBool == true)')
     }
   });
 
-task('setBts-t', 'Set bts var to 0 (Condition: bts == 0')
+task('setBts-t', 'Set bts var to 0 (Condition: bts == 0)')
   .addPositionalParam('address', 'The contract address')
   .setAction(async (taskArgs, hre, runSuper) => {
     const MyContract = await ethers.getContractFactory('MoCMock');
