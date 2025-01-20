@@ -31,6 +31,68 @@ task('set', 'Set state value')
     console.log('set:', tx);
   });
 
+// *******************************************
+// Set each value to evaluate cond_pub == TRUE
+// *******************************************
+task('setQAClock-t', 'Set qACLockedInPending to 1 (Condition: qACLockedInPending > 0')
+  .addPositionalParam('address', 'The contract address')
+  .setAction(async (taskArgs, hre, runSuper) => {
+    const MyContract = await ethers.getContractFactory('MoCMock');
+    const contract = MyContract.attach(taskArgs.address);
+    try {
+      const tx = await contract.setQACLockedInPending(1);
+      console.log('tx:', tx);
+    } catch (e) {
+      throw new Error(`Unexpected error: ${e}`);
+    }
+  });
+
+task('setEmaBool-t', 'Set emaBool var to `true` (Condition: emaBool == true)')
+  .addPositionalParam('address', 'The contract address')
+  .setAction(async (taskArgs, hre, runSuper) => {
+    const MyContract = await ethers.getContractFactory('MoCMock');
+    const contract = MyContract.attach(taskArgs.address);
+    try {
+      const tx = await contract.setEmaBool(1);
+      console.log('tx:', tx);
+    } catch (e) {
+      throw new Error(`Unexpected error: ${e}`);
+    }
+  });
+
+task('setBts-t', 'Set bts var to 0 (Condition: bts == 0')
+  .addPositionalParam('address', 'The contract address')
+  .setAction(async (taskArgs, hre, runSuper) => {
+    const MyContract = await ethers.getContractFactory('MoCMock');
+    const contract = MyContract.attach(taskArgs.address);
+    try {
+      const tx = await contract.setBts(0);
+      console.log('tx:', tx);
+    } catch (e) {
+      throw new Error(`Unexpected error: ${e}`);
+    }
+  });
+
+task(
+  'setNextTC-t',
+  'Set nextTCInterestPayment to `currentBlock - 1` (Condition: currentBlock > nextTCInterestPayment)'
+)
+  .addPositionalParam('address', 'The contract address')
+  .setAction(async (taskArgs, hre, runSuper) => {
+    const MyContract = await ethers.getContractFactory('MoCMock');
+    const contract = MyContract.attach(taskArgs.address);
+    try {
+      const currentBlock = await ethers.provider.getBlockNumber();
+      const tx = await contract.setNextTCInterestPayment(currentBlock - 1);
+      console.log('******************');
+      console.log('currentBlock: ', currentBlock);
+      console.log('******************');
+      console.log('tx:', tx);
+    } catch (e) {
+      throw new Error(`Unexpected error: ${e}`);
+    }
+  });
+
 // **********************
 // Set to arbitrary value
 // **********************
