@@ -47,7 +47,7 @@ task('setQAClock-t', 'Set qACLockedInPending to 1 (Condition: qACLockedInPending
     }
   });
 
-task('setEmaBool-t', 'Set emaBool var to `true` (Condition: emaBool == true)')
+task('setEma-t', 'Set emaBool var to `true` (Condition: emaBool == true)')
   .addPositionalParam('address', 'The contract address')
   .setAction(async (taskArgs, hre, runSuper) => {
     const MyContract = await ethers.getContractFactory('MoCMock');
@@ -110,7 +110,7 @@ task('setQAClock', 'Set qACLockedInPending var to an arbitrary value')
     }
   });
 
-task('setEmaBool', 'Set emaBool var -  0 (false) : 1 (true)')
+task('setEma', 'Set emaBool var -  0 (false) : 1 (true)')
   .addPositionalParam('address', 'The contract address')
   .addPositionalParam('val', '0 (false) : 1 (true)')
   .setAction(async (taskArgs, hre, runSuper) => {
