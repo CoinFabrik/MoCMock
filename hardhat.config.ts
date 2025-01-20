@@ -125,8 +125,8 @@ task('readBts', 'Query bts var')
     const MyContract = await ethers.getContractFactory('MoCMock');
     const contract = MyContract.attach(taskArgs.address);
     try {
-      const tx = await contract.getBts();
-      console.log('bts:', tx);
+      const bts = await contract.getBts();
+      console.log('bts:', bts);
     } catch (e) {
       throw new Error(`Unexpected error: ${e}`);
     }
@@ -138,8 +138,51 @@ task('readNextTC', 'Query nextTCInterestPayment var')
     const MyContract = await ethers.getContractFactory('MoCMock');
     const contract = MyContract.attach(taskArgs.address);
     try {
-      const tx = await contract.nextTCInterestPayment();
-      console.log('nextTCInterestPayment:', tx);
+      const nextTCInterestPayment = await contract.nextTCInterestPayment();
+      console.log('nextTCInterestPayment:', nextTCInterestPayment);
+    } catch (e) {
+      throw new Error(`Unexpected error: ${e}`);
+    }
+  });
+
+// ****************
+// Query all values
+// ****************
+task('readAll', 'Query all state vars')
+  .addPositionalParam('address', 'The contract address')
+  .setAction(async (taskArgs, hre, runSuper) => {
+    const MyContract = await ethers.getContractFactory('MoCMock');
+    const contract = MyContract.attach(taskArgs.address);
+    try {
+      const [
+        mylen,
+        qACLockedInPending,
+        shouldCalculateEma,
+        bts,
+        nextTCInterestPayment,
+      ] = await Promise.all([
+        contract.mylen(),
+        contract.qACLockedInPending(),
+        contract.shouldCalculateEma(),
+        contract.getBts(),
+        contract.nextTCInterestPayment(),
+      ]);
+
+      let state = {
+        mylen,
+        qACLockedInPending,
+        shouldCalculateEma,
+        bts,
+        nextTCInterestPayment,
+      };
+
+      console.log('--------------------------');
+      console.log(
+        'Current blockNumber: ',
+        await ethers.provider.getBlockNumber()
+      );
+      console.log('--------------------------');
+      console.log('Mock Contract state: ', state);
     } catch (e) {
       throw new Error(`Unexpected error: ${e}`);
     }
