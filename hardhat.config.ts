@@ -155,14 +155,12 @@ task('readAll', 'Query all state vars')
     const contract = MyContract.attach(taskArgs.address);
     try {
       const [
-        owner,
         mylen,
         qACLockedInPending,
-        emaBool,
+        shouldCalculateEma,
         bts,
         nextTCInterestPayment,
       ] = await Promise.all([
-        contract.owner(),
         contract.mylen(),
         contract.qACLockedInPending(),
         contract.shouldCalculateEma(),
@@ -171,15 +169,20 @@ task('readAll', 'Query all state vars')
       ]);
 
       let state = {
-        owner,
         mylen,
         qACLockedInPending,
-        emaBool,
+        shouldCalculateEma,
         bts,
         nextTCInterestPayment,
       };
 
-      console.log(state);
+      console.log('--------------------------');
+      console.log(
+        'Current blockNumber: ',
+        await ethers.provider.getBlockNumber()
+      );
+      console.log('--------------------------');
+      console.log('Mock Contract state: ', state);
     } catch (e) {
       throw new Error(`Unexpected error: ${e}`);
     }
