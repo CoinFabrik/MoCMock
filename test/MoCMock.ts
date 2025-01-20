@@ -15,7 +15,7 @@ describe('MoCMock', function () {
   }
 
   describe('Deployment', function () {
-    it('Should init with zero', async function () {
+    it('Should init with cond pub == FALSE', async function () {
       const { mocMock } = await loadFixture(deployOneYearMoCMockFixture);
       expect(await mocMock.mylen()).to.equal(0);
       const _len = await mocMock.getlen();
@@ -25,10 +25,10 @@ describe('MoCMock', function () {
       const emaBool = await mocMock.emaBool();
       expect(emaBool).to.be.false;
       const bts = await mocMock.getBts();
-      expect(bts).to.eq(0);
+      expect(bts).to.eq(1);
       const nextTCInterestPayment = await mocMock.nextTCInterestPayment();
       expect(nextTCInterestPayment).to.eq(
-        await hre.ethers.provider.getBlockNumber()
+        (await hre.ethers.provider.getBlockNumber()) + 1000
       );
     });
 
@@ -62,9 +62,9 @@ describe('MoCMock', function () {
       await mocMock.reset();
       expect(await mocMock.emaBool()).to.be.false;
       expect(await mocMock.qACLockedInPending()).to.eq(0);
-      expect(await mocMock.getBts()).to.eq(0);
+      expect(await mocMock.getBts()).to.eq(1);
       expect(await mocMock.nextTCInterestPayment()).to.eq(
-        await hre.ethers.provider.getBlockNumber()
+        await hre.ethers.provider.getBlockNumber() + 1000
       );
     });
   });
