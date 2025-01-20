@@ -106,14 +106,14 @@ task('readQAClock', 'Query qACLockedInPending var')
     }
   });
 
-task('readEmaBool', 'Query emaBool var')
+task('shouldCalculateEma', 'Query emaBool var')
   .addPositionalParam('address', 'The contract address')
   .setAction(async (taskArgs, hre, runSuper) => {
     const MyContract = await ethers.getContractFactory('MoCMock');
     const contract = MyContract.attach(taskArgs.address);
     try {
-      const emaBool = await contract.emaBool();
-      console.log('emaBool:', emaBool);
+      const emaBool = await contract.shouldCalculateEma();
+      console.log('shouldCalculateEma:', emaBool);
     } catch (e) {
       throw new Error(`Unexpected error: ${e}`);
     }
@@ -165,7 +165,7 @@ task('readAll', 'Query all state vars')
         contract.owner(),
         contract.mylen(),
         contract.qACLockedInPending(),
-        contract.emaBool(),
+        contract.shouldCalculateEma(),
         contract.getBts(),
         contract.nextTCInterestPayment(),
       ]);
