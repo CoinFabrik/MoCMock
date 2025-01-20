@@ -18,7 +18,7 @@ contract MoCMock {
         nextTCInterestPayment = block.number + 1000; // currentBlock > nextTCInterestPayment -> cond pub TRUE
     }
 
-    function push(uint x) public {
+    function push(uint) public {
         mylen = mylen+1;
     }
     function pop() public {
