@@ -5,21 +5,13 @@ import '@nomicfoundation/hardhat-toolbox';
 //const { lock } = await hre.ignition.deploy(ApolloModule);
 //console.log(`Apollo deployed to: ${await lock.getAddress()}`);
 
+// LEGACY len fns
 task('query', 'Query state value: parameters: address')
   .addPositionalParam('address', 'The contract address')
   .setAction(async (taskArgs, hre, runSuper) => {
     const MyContract = await ethers.getContractFactory('MoCMock');
     const contract = MyContract.attach(taskArgs.address);
     console.log('getlen:', await contract.getlen());
-  });
-
-task('reset', 'Reset state value')
-  .addPositionalParam('address', 'The contract address')
-  .setAction(async (taskArgs, hre, runSuper) => {
-    const MyContract = await ethers.getContractFactory('MoCMock');
-    const contract = MyContract.attach(taskArgs.address);
-    const tx = await contract.reset();
-    console.log('reset:', tx);
   });
 
 task('set', 'Set state value')
@@ -31,10 +23,50 @@ task('set', 'Set state value')
     console.log('set:', tx);
   });
 
+// ***********************************************
+// Reset all mock state vars to cond pub === FALSE
+// ***********************************************
+task('reset', 'Reset all mock state vars to cond pub === FALSE')
+  .addPositionalParam('address', 'The contract address')
+  .setAction(async (taskArgs, hre, runSuper) => {
+    const MyContract = await ethers.getContractFactory('MoCMock');
+    const contract = MyContract.attach(taskArgs.address);
+    const tx = await contract.reset();
+    console.log('reset:', tx);
+  });
+
+// ***********************************************
+// Set all mock state vars to cond pub === TRUE
+// ***********************************************
+task('setAll-t', 'Set all mock state vars to cond pub === TRUE')
+  .addPositionalParam('address', 'The contract address')
+  .setAction(async (taskArgs, hre, runSuper) => {
+    const MyContract = await ethers.getContractFactory('MoCMock');
+    const contract = MyContract.attach(taskArgs.address);
+    let tx;
+    try {
+      const currentBlock = await ethers.provider.getBlockNumber();
+
+      tx = await Promise.all([
+        contract.setQACLockedInPending(1),
+        contract.setEmaBool(1), // sets to true
+        contract.setBts(0),
+        contract.setNextTCInterestPayment(currentBlock - 1),
+      ]);
+
+      console.log('tx: ', tx);
+    } catch (e) {
+      throw new Error(`Unexpected error: ${e}`);
+    }
+  });
+
 // *******************************************
 // Set each value to evaluate cond_pub == TRUE
 // *******************************************
-task('setQAClock-t', 'Set qACLockedInPending to 1 (Condition: qACLockedInPending > 0')
+task(
+  'setQAClock-t',
+  'Set qACLockedInPending to 1 (Condition: qACLockedInPending > 0)'
+)
   .addPositionalParam('address', 'The contract address')
   .setAction(async (taskArgs, hre, runSuper) => {
     const MyContract = await ethers.getContractFactory('MoCMock');
