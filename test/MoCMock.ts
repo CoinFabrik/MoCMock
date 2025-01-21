@@ -12,12 +12,9 @@ describe('MoCMock', function () {
     return { mocMock, owner, otherAccount };
   }
 
-  describe('Deployment', function () {
+  describe('Deployment & unit tests', function () {
     it('Should init with cond pub == FALSE', async function () {
       const { mocMock } = await loadFixture(deployOneYearMoCMockFixture);
-      expect(await mocMock.mylen()).to.equal(0);
-      const _len = await mocMock.getlen();
-      expect(_len).to.equal(0);
       const qACLockedInPending = await mocMock.qACLockedInPending();
       expect(qACLockedInPending).to.eq(0);
       const emaBool = await mocMock.emaBool();
@@ -28,21 +25,6 @@ describe('MoCMock', function () {
       expect(nextTCInterestPayment).to.eq(
         (await hre.ethers.provider.getBlockNumber()) + 1000
       );
-    });
-
-    it('Push/pop/reset works..', async function () {
-      const { mocMock, owner } = await loadFixture(deployOneYearMoCMockFixture);
-      expect(await mocMock.getlen()).to.equal(0);
-      await mocMock.push(4);
-      expect(await mocMock.getlen()).to.equal(1);
-      await mocMock.push(4);
-      expect(await mocMock.getlen()).to.equal(2);
-      await mocMock.push(5);
-      expect(await mocMock.getlen()).to.equal(3);
-      await mocMock.pop();
-      expect(await mocMock.getlen()).to.equal(2);
-      await mocMock.reset();
-      expect(await mocMock.getlen()).to.equal(0);
     });
 
     it('setQA.../setEmaBool/ works', async () => {
@@ -67,7 +49,7 @@ describe('MoCMock', function () {
     });
   });
 
-  describe('Conditional publishing conditions', function () {
+  describe('Check conditional publishing conditions', function () {
     let mocMock: MoCMock;
     this.beforeAll(async () => {
       ({ mocMock } = await loadFixture(deployOneYearMoCMockFixture));

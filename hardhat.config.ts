@@ -1,28 +1,6 @@
 import { HardhatUserConfig, task } from 'hardhat/config';
 import '@nomicfoundation/hardhat-toolbox';
 
-//const MoCMockModule = require("../ignition/modules/MoCMock");
-//const { lock } = await hre.ignition.deploy(ApolloModule);
-//console.log(`Apollo deployed to: ${await lock.getAddress()}`);
-
-// LEGACY len fns
-task('query', 'Query state value: parameters: address')
-  .addPositionalParam('address', 'The contract address')
-  .setAction(async (taskArgs, hre, runSuper) => {
-    const MyContract = await ethers.getContractFactory('MoCMock');
-    const contract = MyContract.attach(taskArgs.address);
-    console.log('getlen:', await contract.getlen());
-  });
-
-task('set', 'Set state value')
-  .addPositionalParam('address', 'The contract address')
-  .setAction(async (taskArgs, hre, runSuper) => {
-    const MyContract = await ethers.getContractFactory('MoCMock');
-    const contract = MyContract.attach(taskArgs.address);
-    const tx = await contract.push(42);
-    console.log('set:', tx);
-  });
-
 // ***********************************************
 // Reset all mock state vars to cond pub === FALSE
 // ***********************************************
@@ -249,13 +227,11 @@ task('readAll', 'Query all state vars')
     const contract = MyContract.attach(taskArgs.address);
     try {
       const [
-        mylen,
         qACLockedInPending,
         shouldCalculateEma,
         bts,
         nextTCInterestPayment,
       ] = await Promise.all([
-        contract.mylen(),
         contract.qACLockedInPending(),
         contract.shouldCalculateEma(),
         contract.getBts(),
@@ -263,7 +239,6 @@ task('readAll', 'Query all state vars')
       ]);
 
       let state = {
-        mylen,
         qACLockedInPending,
         shouldCalculateEma,
         bts,
