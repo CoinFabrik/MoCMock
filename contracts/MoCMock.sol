@@ -9,13 +9,13 @@ contract MoCMock {
     uint public mylen=0;
     uint256 public qACLockedInPending = 0;
     bool public emaBool;
-    uint256 private bts = 0;
+    uint256 private bts = 1; // bts == 0 -> cond pub TRUE
     uint256 public nextTCInterestPayment;
 
     constructor() payable {
         mylen=0;
         owner = payable(msg.sender);
-        nextTCInterestPayment = block.number;
+        nextTCInterestPayment = block.number + 1000; // currentBlock > nextTCInterestPayment -> cond pub TRUE
     }
 
     function push(uint) public {
@@ -24,12 +24,14 @@ contract MoCMock {
     function pop() public {
         mylen = mylen-1;
     }
+
+    // Reset all values to match cond pub == FALSE
     function reset() public {
         mylen = 0;
         qACLockedInPending = 0;
         emaBool = false;
-        bts = 0;
-        nextTCInterestPayment = block.number;
+        bts = 1; // bts == 0 -> cond pub TRUE
+        nextTCInterestPayment = block.number + 1000; // currentBlock > nextTCInterestPayment -> cond pub TRUE
     }
     function getlen() public view returns(uint) {
         return mylen;
